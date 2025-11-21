@@ -28,25 +28,77 @@ function App() {
 
   if (!isStarted) {
     return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-violet-900/20 via-black to-black animate-pulse" />
+      <div className="fixed inset-0 w-full h-screen bg-black flex items-center justify-center overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 animated-gradient" />
+        <div className="absolute inset-0 noise-texture" />
         
-        <div className="relative z-10 text-center space-y-12 animate-in fade-in zoom-in duration-1000">
-          <div className="space-y-4">
-            <h1 className="text-7xl md:text-8xl font-bold tracking-tighter text-white drop-shadow-[0_0_30px_rgba(139,92,246,0.3)]">
-              Sonic<span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Flow</span>
+        <div className="relative z-10 text-center fade-in-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap:'10px'}}>
+            <h1 style={{
+              fontSize: 'clamp(4rem, 12vw, 8rem)',
+              fontWeight: 900,
+              letterSpacing: '-0.05em',
+              background: 'linear-gradient(135deg, #ffffff 0%, #ddd6fe 50%, #c4b5fd 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              filter: 'drop-shadow(0 0 40px rgba(139, 92, 246, 0.5))',
+              userSelect: 'none',
+              margin: 0
+            }}>
+              SonicFlow
             </h1>
-            <p className="text-white/40 text-xl font-light tracking-[0.2em] uppercase">Interactive Audio Experience</p>
+            <p style={{
+              color: 'rgba(221, 214, 254, 0.6)',
+              fontSize: 'clamp(1rem, 2vw, 1.5rem)',
+              fontWeight: 300,
+              letterSpacing: '0.3em',
+              textTransform: 'uppercase'
+            }}>
+              Audio Visualization Evolved
+            </p>
           </div>
 
           <button
             onClick={handleStart}
-            className="group relative px-10 py-5 bg-white text-black rounded-full font-bold text-xl hover:scale-105 transition-all duration-300 overflow-hidden shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(139,92,246,0.4)]"
+            className="group relative"
+            style={{
+              padding: '1.5rem 3rem',
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              color: 'white',
+              borderRadius: '9999px',
+              fontSize: '1.25rem',
+              fontWeight: 500,
+              transition: 'all 0.5s',
+              overflow: 'hidden',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+              e.currentTarget.style.boxShadow = '0 0 40px rgba(139, 92, 246, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-violet-500 opacity-0 group-hover:opacity-20 transition-opacity duration-500 bg-[length:200%_100%] animate-gradient" />
-            <span className="relative flex items-center gap-3">
-              <Play size={24} fill="currentColor" />
-              Start Experience
+            <span style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '1rem',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              fontSize: '0.875rem'
+            }}>
+              <Play size={20} style={{ fill: 'white' }} />
+              Enter Experience
             </span>
           </button>
         </div>
@@ -55,45 +107,36 @@ function App() {
   }
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-black">
-      <VisualizerCanvas 
-        getFrequencyData={getFrequencyData} 
-        isPlaying={isPlaying}
-        mode={mode}
-        palette={palette}
-      />
-      
-      {/* Minimal Header */}
-      <div className="absolute top-0 left-0 w-full p-8 flex justify-between items-start pointer-events-none z-50">
-        <div className="space-y-2">
-          <h1 className="text-white/90 font-bold text-2xl tracking-tighter drop-shadow-lg">
-            Sonic<span className="text-white/40">Flow</span>
-          </h1>
-          <div className="flex items-center gap-3 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/5 w-fit">
-            <div className={`w-2 h-2 rounded-full shadow-[0_0_10px_currentColor] ${isPlaying ? 'bg-green-500 text-green-500 animate-pulse' : 'bg-white/20 text-white/20'}`} />
-            <p className="text-white/60 text-[10px] uppercase tracking-widest font-medium">
-              {sourceType === 'microphone' ? 'Live Input' : sourceType === 'system' ? 'System Audio' : 'File Playback'}
-            </p>
-          </div>
-        </div>
+    <div className="flex w-full h-screen bg-black overflow-hidden">
+      {/* Sidebar */}
+      <div className="w-80 h-full flex-shrink-0">
+        <Controls
+          isPlaying={isPlaying}
+          onTogglePlayPause={togglePlayPause}
+          sourceType={sourceType}
+          onSourceChange={(type) => {
+            if (type === 'microphone') connectMicrophone();
+            else if (type === 'system') connectSystemAudio();
+            // File handling is separate via onFileUpload
+          }}
+          onFileUpload={connectFile}
+          audioElement={audioElement}
+          mode={mode}
+          onModeChange={setMode}
+          palette={palette}
+          onPaletteChange={setPalette}
+        />
       </div>
 
-      <Controls
-        isPlaying={isPlaying}
-        onTogglePlayPause={togglePlayPause}
-        sourceType={sourceType}
-        onSourceChange={(type) => {
-          if (type === 'microphone') connectMicrophone();
-          else if (type === 'system') connectSystemAudio();
-          // File handling is separate via onFileUpload
-        }}
-        onFileUpload={connectFile}
-        audioElement={audioElement}
-        mode={mode}
-        onModeChange={setMode}
-        palette={palette}
-        onPaletteChange={setPalette}
-      />
+      {/* Visualizer Area */}
+      <div className="flex-1 h-full relative">
+        <VisualizerCanvas 
+          getFrequencyData={getFrequencyData} 
+          isPlaying={isPlaying}
+          mode={mode}
+          palette={palette}
+        />
+      </div>
     </div>
   );
 }
